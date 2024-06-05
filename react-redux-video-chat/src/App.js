@@ -1,27 +1,27 @@
-import logo from './logo.svg';
 import {
-  BrowserRouter as Router,
-    Switch,
+    BrowserRouter,
+    Routes,
     Route
 } from "react-router-dom";
-import { useEffect } from "react";
+import {useEffect} from "react";
 import Dashboard from "./Dashboard/Dashboard";
 import LoginPage from "./LoginPage/LoginPage";
 import './App.css';
+import {connectWithWebSocket} from "./utils/wssConnection";
 
 function App() {
-  return (
-    <Router>
-      <Switch>
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route path="/">
-          <LoginPage />
-        </Route>
-      </Switch>
-    </Router>
-  );
+    useEffect(() => {
+        connectWithWebSocket();
+    }, []);
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/dashboard" element={<Dashboard />}/>
+                <Route path="/" element={<LoginPage />}/>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
