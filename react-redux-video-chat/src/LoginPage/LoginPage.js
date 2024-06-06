@@ -23,7 +23,7 @@ const LoginPage = ({ saveUsername }) => {
         <div className='login-page_container background_main_color'>
             <div className='login-page_login_box background_secondary_color'>
                 <div className='login-page_logo_container'>
-                    <img className='login-page_logo_image' src={logo} alt='VideoTalker' />
+                    <img className='login-page_logo_image' src={logo} alt="VideoChat" />
                 </div>
                 <div className='login-page_title_container'>
                     <h2>Get on Board</h2>
