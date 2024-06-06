@@ -1,3 +1,5 @@
+import * as callActions from '../actions/callActions';
+
 const initState = {
     localStream: null
 };
