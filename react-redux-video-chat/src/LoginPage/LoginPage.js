@@ -4,6 +4,7 @@ import UsernameInput from "./components/UsernameInput";
 import {setUsername} from "../store/actions/dashboardActions";
 import {connect} from "react-redux";
 import { useNavigate } from 'react-router-dom';
+import { registerNewUser } from '../utils/wssConnection/wssConnection';
 import logo from '../resources/logo.png';
 import './LoginPage.css';
 
