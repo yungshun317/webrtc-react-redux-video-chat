@@ -1,7 +1,8 @@
 import "./ActiveUsersList.css";
 import ActiveUsersListItem from "./ActiveUsersListItem";
+import {connect} from "react-redux";
 
-
+/*
 const activeUsers = [
     {
         socketId: 321,
@@ -20,8 +21,9 @@ const activeUsers = [
         username: "Adam"
     }
 ];
+*/
 
-const ActiveUsersList = () => {
+const ActiveUsersList = ({activeUsers}) => {
     return (
         <div className="active_user_list_container">
             {
@@ -36,4 +38,8 @@ const ActiveUsersList = () => {
     );
 };
 
-export default ActiveUsersList;
+const mapStateToProps = ({ dashboard }) => ({
+    ...dashboard
+});
+
+export default connect(mapStateToProps)(ActiveUsersList);

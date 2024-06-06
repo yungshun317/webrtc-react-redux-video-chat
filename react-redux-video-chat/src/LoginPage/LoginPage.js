@@ -13,8 +13,9 @@ const LoginPage = ({ saveUsername }) => {
     const navigate = useNavigate();
 
     const handleSubmitButtonPressed = () => {
-        navigate('/dashboard');
+        registerNewUser(username);
         saveUsername(username);
+        navigate('/dashboard');
     };
 
     return (
