@@ -35,7 +35,11 @@ export const connectWithWebSocket = () => {
 
     socket.on("webRTC-offer", (data) => {
         webRTCHandler.handleOffer(data);
-    })
+    });
+
+    socket.on("webRTC-answer", (data) => {
+        webRTCHandler.handleAnswer(data);
+    });
 };
 
 export const registerNewUser = (username) => {
