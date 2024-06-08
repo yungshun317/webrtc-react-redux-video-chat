@@ -41,8 +41,6 @@ export const getLocalStream = () => {
         });
 };
 
-let connectedUserSocketId;
-
 const createPeerConnection = () => {
     peerConnection = new RTCPeerConnection(configuration);
 
@@ -107,6 +105,7 @@ export const handlePreOfferAnswer = (data) => {
 
     if (data.answer === preOfferAnswers.CALL_ACCEPTED) {
         // Send WebRTC offer
+        sendOffer();
     } else {
         let rejectionReason;
 
@@ -133,6 +132,16 @@ const sendOffer = async () => {
         offer: offer
     })
 }
+
+export const handleOffer = async () => {
+    await peerConnection.setRemoteDescription(data.offer);
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    wss.sendWebRTCAnswer({
+        callerSocketId: connectedUserSocketId,
+        answer: answer
+    });
+};
 
 export const checkIfCallIsPossible = () => {
     if (store.getState().call.localStream === null ||
