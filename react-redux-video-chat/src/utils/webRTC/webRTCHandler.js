@@ -125,6 +125,15 @@ export const handlePreOfferAnswer = (data) => {
     }
 };
 
+const sendOffer = async () => {
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    wss.sendWebRTCOffer({
+        calleeSocketId: connectedUserSocketId,
+        offer: offer
+    })
+}
+
 export const checkIfCallIsPossible = () => {
     if (store.getState().call.localStream === null ||
     store.getState().call.callState !== callStates.CALL_AVAILABLE) {
