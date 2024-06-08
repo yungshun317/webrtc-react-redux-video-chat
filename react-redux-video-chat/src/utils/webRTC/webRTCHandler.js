@@ -19,11 +19,21 @@ const defaultConstraints = {
     audio: true
 };
 
+const configuration = {
+    iceServers: [{
+        urls: "stun:stun.l.google.com:13902"
+    }]
+};
+
+let connectedUserSocketId;
+let peerConnection;
+
 export const getLocalStream = () => {
     navigator.mediaDevices.getUserMedia(defaultConstraints)
         .then(stream => {
             store.dispatch(setLocalStream(stream));
             store.dispatch(setCallState(callStates.CALL_AVAILABLE));
+            createPeerConnection();
         })
         .catch(err => {
             console.log('error occured when trying to get an access to get local stream');
@@ -32,6 +42,24 @@ export const getLocalStream = () => {
 };
 
 let connectedUserSocketId;
+
+const createPeerConnection = () => {
+    peerConnection = new RTCPeerConnection(configuration);
+
+    const localStream = store.getState().call.localStream;
+
+    for (const track of localStream.getTrack()) {
+        peerConnection.addTrack(track, localStream);
+    }
+
+    peerConnection.ontrack = ({ streams: [stream] }) => {
+        // Dispatch remote stream in our store
+    }
+
+    peerConnection.onicecandidate = (event) => {
+        // Send to connected user, our ice candidates
+    }
+}
 
 export const callToOtherUser = (calleeDetails) => {
     connectedUserSocketId = calleeDetails.socketId;
@@ -81,15 +109,19 @@ export const handlePreOfferAnswer = (data) => {
         // Send WebRTC offer
     } else {
         let rejectionReason;
+
         if (data.answer === preOfferAnswers.CALL_NOT_AVAILABLE) {
             rejectionReason = "Callee is not able to pick up the call right now";
         } else {
             rejectionReason = "Call rejected by the callee";
         }
+
         store.dispatch(setCallRejected({
             rejected: true,
             reason: rejectionReason
         }));
+
+        resetCallData();
     }
 };
 
