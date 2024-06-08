@@ -46,7 +46,7 @@ const createPeerConnection = () => {
 
     const localStream = store.getState().call.localStream;
 
-    for (const track of localStream.getTrack()) {
+    for (const track of localStream.getTracks()) {
         peerConnection.addTrack(track, localStream);
     }
 
@@ -55,7 +55,21 @@ const createPeerConnection = () => {
     }
 
     peerConnection.onicecandidate = (event) => {
+        console.log("getting candidate from stun server");
+
         // Send to connected user, our ice candidates
+        if (event.candidate) {
+            wss.sendWebRTCCandidate({
+                candidate: event.candidate,
+                connectedUserSocketId: connectedUserSocketId
+            });
+        }
+    }
+
+    peerConnection.onconnectionstatechange = (event) => {
+        if (peerConnection.connectionState === "connected") {
+            console.log("successfully connected with other peer");
+        }
     }
 }
 
@@ -133,7 +147,7 @@ const sendOffer = async () => {
     })
 }
 
-export const handleOffer = async () => {
+export const handleOffer = async (data) => {
     await peerConnection.setRemoteDescription(data.offer);
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
@@ -146,6 +160,15 @@ export const handleOffer = async () => {
 export const handleAnswer = async (data) => {
     await peerConnection.setRemoteDescription(data.answer);
 };
+
+export const handleCandidate = async (data) => {
+    try {
+        console.log("adding ice candidates");
+        await peerConnection.addIceCandidate(data.candidate);
+    } catch (err) {
+        console.error("error occurred when trying to add received ice candidate", err);
+    }
+}
 
 export const checkIfCallIsPossible = () => {
     if (store.getState().call.localStream === null ||
