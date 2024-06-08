@@ -3,7 +3,7 @@ import {
     setCallState,
     callStates,
     setCallingDialogVisible,
-    setCallerUsername
+    setCallerUsername, setCallRejected
 } from "../../store/actions/callActions";
 import store from "../../store/store";
 import * as wss from "../wssConnection/wssConnection";
@@ -51,7 +51,7 @@ export const handlePreOffer = (data) => {
         store.dispatch(setCallerUsername(data.callerUsername));
         store.dispatch(setCallState(callStates.CALL_REQUESTED));
     } else {
-        wss.sendPreOffer({
+        wss.sendPreOfferAnswer({
             callerSocketId: data.callerSocketId,
             answer: preOfferAnswers.CALL_NOT_AVAILABLE
         });
@@ -70,6 +70,27 @@ export const rejectIncomingCallRequest= () => {
         callerSocketId: connectedUserSocketId,
         answer: preOfferAnswers.CALL_REJECTED
     });
+
+    resetCallData();
+};
+
+export const handlePreOfferAnswer = (data) => {
+    store.dispatch(setCallingDialogVisible(false));
+
+    if (data.answer === preOfferAnswers.CALL_ACCEPTED) {
+        // Send WebRTC offer
+    } else {
+        let rejectionReason;
+        if (data.answer === preOfferAnswers.CALL_NOT_AVAILABLE) {
+            rejectionReason = "Callee is not able to pick up the call right now";
+        } else {
+            rejectionReason = "Call rejected by the callee";
+        }
+        store.dispatch(setCallRejected({
+            rejected: true,
+            reason: rejectionReason
+        }));
+    }
 };
 
 export const checkIfCallIsPossible = () => {
