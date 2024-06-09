@@ -3,7 +3,7 @@ import {
     setCallState,
     callStates,
     setCallingDialogVisible,
-    setCallerUsername, setCallRejected
+    setCallerUsername, setCallRejected, setRemoteStream
 } from "../../store/actions/callActions";
 import store from "../../store/store";
 import * as wss from "../wssConnection/wssConnection";
@@ -52,6 +52,7 @@ const createPeerConnection = () => {
 
     peerConnection.ontrack = ({ streams: [stream] }) => {
         // Dispatch remote stream in our store
+        store.dispatch(setRemoteStream(stream));
     }
 
     peerConnection.onicecandidate = (event) => {
@@ -103,6 +104,8 @@ export const acceptIncomingCallRequest = () => {
         callerSocketId: connectedUserSocketId,
         answer: preOfferAnswers.CALL_ACCEPTED
     });
+
+    store.dispatch(setCallState(callStates.CALL_IN_PROGRESS));
 };
 
 export const rejectIncomingCallRequest= () => {
