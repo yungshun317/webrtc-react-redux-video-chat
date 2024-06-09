@@ -23,7 +23,7 @@ const activeUsers = [
 ];
 */
 
-const ActiveUsersList = ({activeUsers}) => {
+const ActiveUsersList = ({activeUsers, callState}) => {
     return (
         <div className="active_user_list_container">
             {
@@ -31,6 +31,7 @@ const ActiveUsersList = ({activeUsers}) => {
                     <ActiveUsersListItem
                         key={activeUser.socketId}
                         activeUser={activeUser}
+                        callState={callState}
                     />
                 )
             }
@@ -38,8 +39,9 @@ const ActiveUsersList = ({activeUsers}) => {
     );
 };
 
-const mapStateToProps = ({ dashboard }) => ({
-    ...dashboard
+const mapStateToProps = ({ dashboard, call }) => ({
+    ...dashboard,
+    ...call
 });
 
 export default connect(mapStateToProps)(ActiveUsersList);
