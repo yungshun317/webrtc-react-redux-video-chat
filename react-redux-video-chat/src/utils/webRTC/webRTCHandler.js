@@ -3,7 +3,7 @@ import {
     setCallState,
     callStates,
     setCallingDialogVisible,
-    setCallerUsername, setCallRejected, setRemoteStream
+    setCallerUsername, setCallRejected, setRemoteStream, setScreenSharingActive
 } from "../../store/actions/callActions";
 import store from "../../store/store";
 import * as wss from "../wssConnection/wssConnection";
@@ -186,3 +186,26 @@ export const resetCallData = () => {
     connectedUserSocketId = null;
     store.dispatch(setCallState(callStates.CALL_AVAILABLE));
 };
+
+let screenSharingStream;
+
+export const switchForScreenSharingStream = async () => {
+    if (!store.getState().call.screenSharingActive) {
+        try {
+            screenSharingStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            store.dispatch(setScreenSharingActive(true));
+            const senders = peerConnection.getSenders();
+            const sender = senders.find(sender => sender.track.kind == screenSharingStream.getVideoTracks()[0].kind);
+            sender.replaceTrack(screenSharingStream.getVideoTracks()[0]);
+        } catch (err) {
+            console.error('error occurred when trying to get screen sharing stream', err);
+        }
+    } else {
+        const localStream = store.getState().call.localStream;
+        const senders = peerConnection.getSenders();
+        const sender = senders.find(sender => sender.track.kind == localStream.getVideoTracks()[0].kind);
+        sender.replaceTrack(localStream.getVideoTracks()[0]);
+        store.dispatch(setScreenSharingActive(false));
+        screenSharingStream.getTracks().forEach(track => track.stop());
+    }
+}
